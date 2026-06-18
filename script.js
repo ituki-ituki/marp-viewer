@@ -1,7 +1,6 @@
 import { Marp } from "https://esm.sh/@marp-team/marp-core@4";
 
 const editor = document.getElementById("editor");
-const editorPane = document.getElementById("editorPane");
 const preview = document.getElementById("preview");
 const pdfBtn = document.getElementById("pdfBtn");
 const editorMode = document.getElementById("editorMode");
@@ -34,15 +33,6 @@ const withFrontmatter = (md) => {
   if (/^---[\s\S]*?---\s*/.test(md)) return md;
   return `---\nmarp: true\ntheme: custom\npaginate: true\n---\n\n${md}`;
 };
-
-const localImageStore = new Map();
-const EMBED_IMG = /!\[([^\]]*)\]\(marp-embed:([^)]+)\)/g;
-
-const resolveLocalEmbeds = (md) =>
-  md.replace(EMBED_IMG, (full, alt, id) => {
-    const url = localImageStore.get(id);
-    return url ? `![${alt}](${url})` : full;
-  });
 
 const scrollRatio = (el) => {
   const max = el.scrollHeight - el.clientHeight;
@@ -77,7 +67,7 @@ preview.addEventListener("scroll", () => {
 const render = () => {
   const ratio = scrollRatio(editor);
   const marp = createMarp();
-  const markdown = withFrontmatter(resolveLocalEmbeds(mdText));
+  const markdown = withFrontmatter(mdText);
   const { html, css } = marp.render(markdown);
   preview.innerHTML = `<style>${css}</style>${html}`;
   setScrollRatio(preview, ratio);
@@ -107,87 +97,6 @@ editor.addEventListener("input", () => {
   persistEditorToMode();
   render();
 });
-
-// PNG / JPEG をドロップすると Markdown 画像を挿入（データはメモリ保持）
-const allowedImageFile = (file) => {
-  if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/jpg") {
-    return true;
-  }
-  return /\.(png|jpe?g)$/i.test(file.name);
-};
-
-const readFileAsDataURL = (file) =>
-  new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
-    r.readAsDataURL(file);
-  });
-
-const safeImageAlt = (name) => name.replace(/\]/g, "");
-
-const insertImages = async (files) => {
-  if (editorMode.value !== "md" || files.length === 0) return;
-
-  const start = editor.selectionStart;
-  const end = editor.selectionEnd;
-  const before = editor.value.slice(0, start);
-  const after = editor.value.slice(end);
-
-  const blocks = await Promise.all(
-    files.map(async (file) => {
-      const id = crypto.randomUUID();
-      const dataUrl = await readFileAsDataURL(file);
-      localImageStore.set(id, dataUrl);
-      return `![${safeImageAlt(file.name)}](marp-embed:${id})`;
-    })
-  );
-  const insertion = `${blocks.join("\n\n")}\n`;
-
-  editor.value = before + insertion + after;
-  mdText = editor.value;
-  const caret = before.length + insertion.length;
-  editor.selectionStart = editor.selectionEnd = caret;
-  render();
-  editor.focus();
-};
-
-let editorDndDepth = 0;
-
-const onDragEnter = (e) => {
-  e.preventDefault();
-  editorDndDepth++;
-  editorPane.classList.add("editor-dnd-over");
-};
-
-const onDragLeave = (e) => {
-  e.preventDefault();
-  editorDndDepth = Math.max(0, editorDndDepth - 1);
-  if (editorDndDepth === 0) editorPane.classList.remove("editor-dnd-over");
-};
-
-const onDragOver = (e) => {
-  e.preventDefault();
-  if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
-    e.dataTransfer.dropEffect = "copy";
-  }
-};
-
-const onDrop = async (e) => {
-  e.preventDefault();
-  editorDndDepth = 0;
-  editorPane.classList.remove("editor-dnd-over");
-
-  const files = [...e.dataTransfer.files].filter(allowedImageFile);
-  await insertImages(files);
-};
-
-for (const el of [editor, editorPane]) {
-  el.addEventListener("dragenter", onDragEnter);
-  el.addEventListener("dragleave", onDragLeave);
-  el.addEventListener("dragover", onDragOver);
-  el.addEventListener("drop", onDrop);
-}
 
 syncEditorFromMode();
 render();
@@ -229,7 +138,7 @@ const printHtmlDocument = (fullHtml) => {
 pdfBtn.addEventListener("click", () => {
   persistEditorToMode();
   const marp = createMarp();
-  const markdown = withFrontmatter(resolveLocalEmbeds(mdText));
+  const markdown = withFrontmatter(mdText);
   const { html, css } = marp.render(markdown);
   const fullHtml = `<!doctype html>
 <html lang="ja">
