@@ -22,20 +22,30 @@ paginate: true
 
 ---
 
-### <i class="fa-solid fa-layer-group"></i> **10種**のレイアウト
+<!-- _class: catalog -->
 
-| クラス名 | 用途 |
-|---|---|
-| `title` | 表紙。H1 + サブテキスト |
-| `section` | 中扉。章の区切り |
-| (なし) | 基本レイアウト。H3で始める |
-| `content-right` | 左テキスト、右に画像 |
-| `image` | 画像を大きく見せる |
-| `highlight` | 中央にキーメッセージ |
-| `metric` | 大きな数字・指標を横並び |
-| `grid` | 3列グリッド |
-| `table-lg` | 大きめテーブル |
-| `table-sm` | 小さめテーブル |
+### <i class="fa-solid fa-layer-group"></i> **13種**のレイアウト
+
+- **title** — 表紙。H1 + サブテキスト
+- **section** — 中扉。章の区切り
+- **(なし)** — 基本レイアウト。H3で始める
+- **content-right** — 左テキスト、右に画像
+- **image** — 画像を大きく見せる
+- **highlight** — 中央にキーメッセージ
+- **metric** — 大きな数字・指標を横並び
+
+---
+
+<!-- _class: catalog -->
+
+### <i class="fa-solid fa-layer-group"></i> **13種**のレイアウト（続き）
+
+- **grid** — 3列グリッド
+- **steps** — 縦並びの番号ステップ
+- **flow** — 横フロー図
+- **catalog** — 箇条書きリスト
+- **table-lg** — 大きめテーブル
+- **table-sm** — 小さめテーブル
 
 `accent` を追加すると上部にアクセントカラーのボーダーが付きます。
 
@@ -167,6 +177,26 @@ paginate: true
 
 ---
 
+<!-- _class: steps -->
+
+### <i class="fa-solid fa-list-ol"></i> **steps** で縦並びステップ
+
+1. 課題を整理する
+2. 仮説を立てて試す
+3. 結果を共有する
+
+---
+
+<!-- _class: flow -->
+
+### <i class="fa-solid fa-diagram-project"></i> **flow** で処理の流れ
+
+- **入力** Markdown で記述
+- **変換** テーマ CSS で整形
+- **出力** プレビュー / PDF
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
@@ -183,14 +213,3 @@ paginate: true
 - <i class="fa-solid fa-circle" style="color: var(--color-danger);"></i> **Danger**  — 警告や注意喚起（CSS変数として定義済み）
 
 > 色は最小限に。多すぎると散漫になります。
-
----
-
-<!-- _class: title -->
-<!-- _paginate: false -->
-
-# Write **Less**, Show More
-
-<br>
-
-余計なものを削ぎ落とし、伝えたいことだけを

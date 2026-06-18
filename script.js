@@ -1,30 +1,28 @@
 import { Marp } from "https://esm.sh/@marp-team/marp-core@4";
 
 const editor = document.getElementById("editor");
+const editorPane = document.getElementById("editorPane");
 const preview = document.getElementById("preview");
 const pdfBtn = document.getElementById("pdfBtn");
 const editorMode = document.getElementById("editorMode");
 
-const DEFAULT_THEME_URL = "./template.css";
-const DEFAULT_MARKDOWN_URL = "./template.md";
+const DEFAULT_THEME_URL = "template/template.css";
+const DEFAULT_MARKDOWN_URL = "template/template.md";
 
 let mdText = "";
 let cssText = "";
 let lastEditorMode = "md";
 
-const loadDefaultCss = async () => {
-  const r = await fetch(DEFAULT_THEME_URL, { cache: "no-store" });
-  if (!r.ok) throw new Error("デフォルトテーマ（template.css）を読めません");
+const loadText = async (url, label) => {
+  const r = await fetch(url, { cache: "no-store" });
+  if (!r.ok) throw new Error(`${label} を読めません`);
   return r.text();
 };
 
-const loadDefaultMarkdown = async () => {
-  const r = await fetch(DEFAULT_MARKDOWN_URL, { cache: "no-store" });
-  if (!r.ok) throw new Error("デフォルト Markdown（template.md）を読めません");
-  return r.text();
-};
-
-[cssText, mdText] = await Promise.all([loadDefaultCss(), loadDefaultMarkdown()]);
+[cssText, mdText] = await Promise.all([
+  loadText(DEFAULT_THEME_URL, "template.css"),
+  loadText(DEFAULT_MARKDOWN_URL, "template.md"),
+]);
 
 const createMarp = () => {
   const marp = new Marp({ html: true });
@@ -37,7 +35,6 @@ const withFrontmatter = (md) => {
   return `---\nmarp: true\ntheme: custom\npaginate: true\n---\n\n${md}`;
 };
 
-// ドロップ画像の実体（data URL）。エディタには marp-embed:ID のみ表示
 const localImageStore = new Map();
 const EMBED_IMG = /!\[([^\]]*)\]\(marp-embed:([^)]+)\)/g;
 
@@ -47,11 +44,43 @@ const resolveLocalEmbeds = (md) =>
     return url ? `![${alt}](${url})` : full;
   });
 
+const scrollRatio = (el) => {
+  const max = el.scrollHeight - el.clientHeight;
+  return max > 0 ? el.scrollTop / max : 0;
+};
+
+const setScrollRatio = (el, ratio) => {
+  const max = el.scrollHeight - el.clientHeight;
+  el.scrollTop = max > 0 ? ratio * max : 0;
+};
+
+let scrollSyncing = false;
+
+editor.addEventListener("scroll", () => {
+  if (scrollSyncing) return;
+  scrollSyncing = true;
+  setScrollRatio(preview, scrollRatio(editor));
+  requestAnimationFrame(() => {
+    scrollSyncing = false;
+  });
+});
+
+preview.addEventListener("scroll", () => {
+  if (scrollSyncing) return;
+  scrollSyncing = true;
+  setScrollRatio(editor, scrollRatio(preview));
+  requestAnimationFrame(() => {
+    scrollSyncing = false;
+  });
+});
+
 const render = () => {
+  const ratio = scrollRatio(editor);
   const marp = createMarp();
   const markdown = withFrontmatter(resolveLocalEmbeds(mdText));
   const { html, css } = marp.render(markdown);
   preview.innerHTML = `<style>${css}</style>${html}`;
+  setScrollRatio(preview, ratio);
 };
 
 const syncEditorFromMode = () => {
@@ -79,11 +108,12 @@ editor.addEventListener("input", () => {
   render();
 });
 
-// PNG / JPEG をドロップするとファイル名＋短い参照を挿入（画像データはメモリのみ）
+// PNG / JPEG をドロップすると Markdown 画像を挿入（データはメモリ保持）
 const allowedImageFile = (file) => {
-  if (file.type === "image/png" || file.type === "image/jpeg") return true;
-  if (!file.type && /\.(png|jpe?g)$/i.test(file.name)) return true;
-  return false;
+  if (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/jpg") {
+    return true;
+  }
+  return /\.(png|jpe?g)$/i.test(file.name);
 };
 
 const readFileAsDataURL = (file) =>
@@ -96,34 +126,8 @@ const readFileAsDataURL = (file) =>
 
 const safeImageAlt = (name) => name.replace(/\]/g, "");
 
-let editorDndDepth = 0;
-
-editor.addEventListener("dragenter", (e) => {
-  e.preventDefault();
-  editorDndDepth++;
-  editor.classList.add("editor-dnd-over");
-});
-
-editor.addEventListener("dragleave", (e) => {
-  e.preventDefault();
-  editorDndDepth = Math.max(0, editorDndDepth - 1);
-  if (editorDndDepth === 0) editor.classList.remove("editor-dnd-over");
-});
-
-editor.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = "copy";
-});
-
-editor.addEventListener("drop", async (e) => {
-  e.preventDefault();
-  editorDndDepth = 0;
-  editor.classList.remove("editor-dnd-over");
-
-  if (editorMode.value !== "md") return;
-
-  const files = [...e.dataTransfer.files].filter(allowedImageFile);
-  if (files.length === 0) return;
+const insertImages = async (files) => {
+  if (editorMode.value !== "md" || files.length === 0) return;
 
   const start = editor.selectionStart;
   const end = editor.selectionEnd;
@@ -135,19 +139,55 @@ editor.addEventListener("drop", async (e) => {
       const id = crypto.randomUUID();
       const dataUrl = await readFileAsDataURL(file);
       localImageStore.set(id, dataUrl);
-      const alt = safeImageAlt(file.name);
-      return `![${alt}](marp-embed:${id})`;
+      return `![${safeImageAlt(file.name)}](marp-embed:${id})`;
     })
   );
   const insertion = `${blocks.join("\n\n")}\n`;
 
   editor.value = before + insertion + after;
+  mdText = editor.value;
   const caret = before.length + insertion.length;
   editor.selectionStart = editor.selectionEnd = caret;
-
-  editor.dispatchEvent(new Event("input", { bubbles: true }));
+  render();
   editor.focus();
-});
+};
+
+let editorDndDepth = 0;
+
+const onDragEnter = (e) => {
+  e.preventDefault();
+  editorDndDepth++;
+  editorPane.classList.add("editor-dnd-over");
+};
+
+const onDragLeave = (e) => {
+  e.preventDefault();
+  editorDndDepth = Math.max(0, editorDndDepth - 1);
+  if (editorDndDepth === 0) editorPane.classList.remove("editor-dnd-over");
+};
+
+const onDragOver = (e) => {
+  e.preventDefault();
+  if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
+    e.dataTransfer.dropEffect = "copy";
+  }
+};
+
+const onDrop = async (e) => {
+  e.preventDefault();
+  editorDndDepth = 0;
+  editorPane.classList.remove("editor-dnd-over");
+
+  const files = [...e.dataTransfer.files].filter(allowedImageFile);
+  await insertImages(files);
+};
+
+for (const el of [editor, editorPane]) {
+  el.addEventListener("dragenter", onDragEnter);
+  el.addEventListener("dragleave", onDragLeave);
+  el.addEventListener("dragover", onDragOver);
+  el.addEventListener("drop", onDrop);
+}
 
 syncEditorFromMode();
 render();

@@ -4,29 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Marp Viewer</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="template/favicon.png" type="image/png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <div class="brand">
-      <h1>Marp Viewer</h1>
+      <img src="template/favicon.png" alt="Marp Viewer" class="logo" style="height: 2em; vertical-align: middle;">
+      <h1 style="display: inline-block; vertical-align: middle; line-height: 2em; margin: 0 0 0 0.5em;">Marp Viewer</h1>
     </div>
     <div class="toolbar">
-      <label class="mode-select">
-        <span class="field-label">編集</span>
-        <select id="editorMode" aria-label="Markdown または CSS">
-          <option value="md">Markdown</option>
-          <option value="css">CSS</option>
-        </select>
-      </label>
+      <select id="editorMode" aria-label="Markdown または CSS">
+        <option value="md">Markdown</option>
+        <option value="css">CSS</option>
+      </select>
       <span class="spacer"></span>
       <button id="pdfBtn" type="button">PDF出力</button>
     </div>
   </header>
 
   <main>
-    <textarea id="editor" spellcheck="false"></textarea>
+    <div class="editor-pane" id="editorPane">
+      <textarea id="editor" spellcheck="false" placeholder="PNG / JPEG をドロップすると画像を挿入"></textarea>
+    </div>
     <div id="preview"></div>
   </main>
 
