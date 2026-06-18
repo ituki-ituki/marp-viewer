@@ -69,17 +69,6 @@ section.table-sm table{font-size:22px;line-height:1.5;margin:0}
 section.table-sm thead th{font-size:20px;padding:10px 14px}
 section.table-sm tbody td{padding:8px 14px;font-size:22px}
 section.table-sm p{font-size:22px;color:var(--color-light);margin-top:8px}
-section.steps ol{list-style:none;padding:0;margin:0;width:100%;counter-reset:step}
-section.steps li{display:grid;grid-template-columns:48px 1fr;column-gap:18px;align-items:start;min-height:56px;padding:10px 0;position:relative;font-size:24px;line-height:1.45;margin:0}
-section.steps li::before{grid-column:1;grid-row:1;counter-increment:step;content:counter(step);width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:3px solid var(--color-primary);border-radius:50%;font-size:22px;font-weight:700;color:var(--color-primary);background:#fff;z-index:1;justify-self:center}
-section.steps li>p{grid-column:2;margin:0}
-section.steps li:not(:last-child)::after{content:'';position:absolute;left:22px;top:58px;bottom:-10px;width:4px;background:linear-gradient(180deg,var(--color-primary),var(--color-accent));border-radius:2px;z-index:0}
-section.flow ul{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 36px;list-style:none;padding:0;margin:0;width:100%}
-section.flow li{position:relative;min-width:0;padding:14px 16px;border-radius:var(--radius);background:#fff;border:2px solid var(--color-bg-alt);box-shadow:0 4px 16px rgba(0,0,0,.06);font-size:20px;font-weight:700;text-align:center;line-height:1.4;margin:0}
-section.flow li strong{display:block;font-size:26px;color:var(--color-primary);margin-bottom:4px}
-section.flow li+li::before{content:'→';position:absolute;left:-28px;top:50%;transform:translateY(-50%);font-size:28px;color:var(--color-accent);font-weight:700}
-section.flow li:nth-child(4n):not(:last-child)::after{content:'→';position:absolute;left:50%;bottom:-26px;transform:translateX(-50%) rotate(90deg);font-size:28px;color:var(--color-accent);font-weight:700;line-height:1}
-section.flow li:nth-child(4n+1):not(:first-child)::before{display:none}
 section.catalog ul{list-style:none;padding:0;margin:0}
 section.catalog li{position:relative;padding:0 0 0 32px;font-size:30px;line-height:1.6;margin:0 0 18px 0}
 section.catalog li:last-child{margin-bottom:0}

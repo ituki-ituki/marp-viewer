@@ -24,7 +24,7 @@ paginate: true
 
 <!-- _class: catalog -->
 
-### <i class="fa-solid fa-layer-group"></i> **13種**のレイアウト
+### <i class="fa-solid fa-layer-group"></i> **11種**のレイアウト
 
 - **title** — 表紙。H1 + サブテキスト
 - **section** — 中扉。章の区切り
@@ -38,11 +38,9 @@ paginate: true
 
 <!-- _class: catalog -->
 
-### <i class="fa-solid fa-layer-group"></i> **13種**のレイアウト（続き）
+### <i class="fa-solid fa-layer-group"></i> **11種**のレイアウト（続き）
 
 - **grid** — 3列グリッド
-- **steps** — 縦並びの番号ステップ
-- **flow** — 横フロー図
 - **catalog** — 箇条書きリスト
 - **table-lg** — 大きめテーブル
 - **table-sm** — 小さめテーブル
@@ -174,26 +172,6 @@ paginate: true
 - `table-lg accent` のように組み合わせるとテーブルヘッダーも変化
 
 > 注目させたいセクションに。
-
----
-
-<!-- _class: steps -->
-
-### <i class="fa-solid fa-list-ol"></i> **steps** で縦並びステップ
-
-1. 課題を整理する
-2. 仮説を立てて試す
-3. 結果を共有する
-
----
-
-<!-- _class: flow -->
-
-### <i class="fa-solid fa-diagram-project"></i> **flow** で処理の流れ
-
-- **入力** Markdown で記述
-- **変換** テーマ CSS で整形
-- **出力** プレビュー / PDF
 
 ---
 
