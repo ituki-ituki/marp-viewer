@@ -7,7 +7,7 @@ const pdfBtn = document.getElementById("pdfBtn");
 const editorMode = document.getElementById("editorMode");
 
 const DEFAULT_THEME_URL = "template/template.css";
-const DEFAULT_MARKDOWN_URL = "template/template.md";
+const DEFAULT_MARKDOWN_URL = "template/template.txt";
 
 let mdText = "";
 let cssText = "";
@@ -21,7 +21,7 @@ const loadText = async (url, label) => {
 
 [cssText, mdText] = await Promise.all([
   loadText(DEFAULT_THEME_URL, "template.css"),
-  loadText(DEFAULT_MARKDOWN_URL, "template.md"),
+  loadText(DEFAULT_MARKDOWN_URL, "template.txt"),
 ]);
 
 const createMarp = () => {
