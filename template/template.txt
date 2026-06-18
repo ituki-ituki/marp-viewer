@@ -99,6 +99,20 @@ paginate: true
 
 ---
 
+<!-- _class: catalog -->
+
+### <i class="fa-solid fa-list"></i> **catalog** で箇条書きリスト
+
+- **入力** Markdown の `-` で書くだけ
+- **強調** `**ラベル**` でプライマリカラーに
+- **マーカー** 左にアクセントカラーの `›`
+- **用途** 機能一覧・要件・チェックリスト
+- **改ページ** 項目が多いときは `---` で分割
+
+補足テキストはリストの下に段落として置けます。
+
+---
+
 <!-- _class: content-right -->
 
 ### <i class="fa-solid fa-image"></i> **content-right** で画像配置
@@ -186,8 +200,8 @@ paginate: true
 
 <br>
 
-- <i class="fa-solid fa-circle" style="color: var(--color-primary);"></i> **Primary**  — 見出し強調、リンク
-- <i class="fa-solid fa-circle" style="color: var(--color-accent);"></i> **Accent**  — 引用線、セクション下線、`accent` ボーダー
-- <i class="fa-solid fa-circle" style="color: var(--color-danger);"></i> **Danger**  — 警告や注意喚起（CSS変数として定義済み）
+- <i class="fa-solid fa-circle" style="color: var(--color-primary);"></i> **Primary** #1E3A8A  — 見出し強調、リンク
+- <i class="fa-solid fa-circle" style="color: var(--color-accent);"></i> **Accent** #0EA5E9  — 引用線、セクション下線、`accent` ボーダー
+- <i class="fa-solid fa-circle" style="color: var(--color-danger);"></i> **Danger** #ff0000  — 警告や注意喚起（CSS変数として定義済み）
 
 > 色は最小限に。多すぎると散漫になります。
