@@ -2,6 +2,7 @@
 marp: true
 theme: custom
 paginate: true
+math: katex
 ---
 
 <!-- _class: title -->
@@ -44,8 +45,6 @@ paginate: true
 - **catalog** — 箇条書きリスト
 - **table-lg** — 大きめテーブル
 - **table-sm** — 小さめテーブル
-
-`accent` を追加すると上部にアクセントカラーのボーダーが付きます。
 
 ---
 
@@ -186,6 +185,28 @@ paginate: true
 - `table-lg accent` のように組み合わせるとテーブルヘッダーも変化
 
 > 注目させたいセクションに。
+
+---
+
+<!-- _class: catalog -->
+
+### <i class="fa-solid fa-code"></i> **コード**や**数式**も Markdown に書く
+
+- コードブロックを使用する場合は、```で囲む。
+
+```js
+const marp = new Marp({ html: true });
+marp.render(markdown);
+```
+
+- 先頭の frontmatter に `math: katex` を付ければ、数式も```$```マークで書ける。
+
+インライン: $ax^2+bx+c=0$
+ブロック:
+
+$$
+E = mc^2
+$$
 
 ---
 

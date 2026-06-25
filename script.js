@@ -24,14 +24,28 @@ const loadText = async (url, label) => {
 ]);
 
 const createMarp = () => {
-  const marp = new Marp({ html: true });
+  const marp = new Marp({ html: true, math: "katex" });
   marp.themeSet.add(cssText);
   return marp;
 };
 
-const withFrontmatter = (md) => {
-  if (/^---[\s\S]*?---\s*/.test(md)) return md;
-  return `---\nmarp: true\ntheme: custom\npaginate: true\n---\n\n${md}`;
+const stripOuterFence = (raw) => {
+  const lines = raw.replace(/^\uFEFF/, "").split(/\r?\n/);
+  if (!/^```(?:markdown|md)?\s*$/i.test(lines[0]?.trim() ?? "")) return raw;
+
+  lines.shift();
+  let last = lines.length - 1;
+  while (last >= 0 && lines[last].trim() === "") last--;
+  if (last >= 0 && lines[last].trim() === "```") lines.length = last;
+  return lines.join("\n");
+};
+
+const prepareMarkdown = (raw) => {
+  let md = stripOuterFence(raw).trim();
+  if (!/^---[\s\S]*?---/.test(md)) {
+    md = `---\nmarp: true\ntheme: custom\npaginate: true\n---\n\n${md}`;
+  }
+  return md;
 };
 
 const scrollRatio = (el) => {
@@ -67,8 +81,7 @@ preview.addEventListener("scroll", () => {
 const render = () => {
   const ratio = scrollRatio(editor);
   const marp = createMarp();
-  const markdown = withFrontmatter(mdText);
-  const { html, css } = marp.render(markdown);
+  const { html, css } = marp.render(prepareMarkdown(mdText));
   preview.innerHTML = `<style>${css}</style>${html}`;
   setScrollRatio(preview, ratio);
 };
@@ -96,6 +109,17 @@ editorMode.addEventListener("change", () => {
 editor.addEventListener("input", () => {
   persistEditorToMode();
   render();
+});
+
+editor.addEventListener("paste", () => {
+  queueMicrotask(() => {
+    if (editorMode.value !== "md") return;
+    const stripped = stripOuterFence(editor.value);
+    if (stripped === editor.value) return;
+    editor.value = stripped;
+    mdText = stripped;
+    render();
+  });
 });
 
 syncEditorFromMode();
@@ -138,8 +162,7 @@ const printHtmlDocument = (fullHtml) => {
 pdfBtn.addEventListener("click", () => {
   persistEditorToMode();
   const marp = createMarp();
-  const markdown = withFrontmatter(mdText);
-  const { html, css } = marp.render(markdown);
+  const { html, css } = marp.render(prepareMarkdown(mdText));
   const fullHtml = `<!doctype html>
 <html lang="ja">
 <head>
